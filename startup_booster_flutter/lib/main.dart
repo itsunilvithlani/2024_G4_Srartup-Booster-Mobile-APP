@@ -1,0 +1,84 @@
+import 'dart:developer';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_notification_channel/flutter_notification_channel.dart';
+//import 'package:flutter_notification_channel/notification_importance.dart';
+import 'package:startup_booster_client/pullventure_client.dart';
+import 'package:flutter/material.dart';
+import 'package:startup_booster_flutter/auth/sign_in_choice.dart';
+import 'package:serverpod_flutter/serverpod_flutter.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: FirebaseOptions(apiKey: "AIzaSyD6UTaJwa8W6VBme45yS0mvxYWQVS2aSs0",
+      appId: "1:366993533377:android:ec5884318385865d00e740",
+      messagingSenderId: "366993533377",
+      projectId:"startup-boosterapp"));
+  /*var result = await FlutterNotificationChannel.registerNotificationChannel(
+    description: 'For showing message notifications',
+    id: 'pullventure_chat',
+    importance: NotificationImportance.IMPORTANCE_HIGH,
+    name: 'Chats',
+  );*/
+  //log(result);
+  await AwesomeNotifications().initialize(
+      null, //'resource://drawable/res_app_icon',//
+      [
+        NotificationChannel(
+            channelKey: 'alerts',
+            channelName: 'Alerts',
+            channelDescription: 'Notification tests as alerts',
+            playSound: true,
+            onlyAlertOnce: true,
+            groupAlertBehavior: GroupAlertBehavior.Children,
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Private,
+            defaultColor: Colors.deepPurple,
+            ledColor: Colors.deepPurple)
+      ],
+      debug: true);
+
+  runApp(const MyApp());
+}
+
+// Sets up a singleton client object that can be used to talk to the server from
+// anywhere in our app. The client is generated from your server code.
+// The client is set up to connect to a Serverpod running on a local server on
+// the default port. You will need to modify this to connect to staging or
+// production servers.
+var client = Client('http://127.0.0.1:8080/')
+  ..connectivityMonitor = FlutterConnectivityMonitor();
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Startup Booster',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const HomePage(title: 'Startup Booster'),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  final String title;
+  const HomePage({super.key, required this.title});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: SignIn(),
+    );
+  }
+}
